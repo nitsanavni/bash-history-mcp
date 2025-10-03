@@ -74,7 +74,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     try {
       const proc = Bun.spawn(
-        ["atuin", "search", "--limit", String(limit), "--cmd-only", query],
+        [
+          "atuin",
+          "search",
+          "--limit",
+          String(limit),
+          "--search-mode",
+          "fuzzy",
+          "--filter-mode",
+          "global",
+          "--cmd-only",
+          query,
+        ],
         {
           stdout: "pipe",
           stderr: "pipe",
@@ -123,7 +134,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     try {
       const proc = Bun.spawn(
-        ["atuin", "search", "--limit", String(limit), "--cmd-only", ""],
+        [
+          "atuin",
+          "search",
+          "--limit",
+          String(limit),
+          "--search-mode",
+          "fuzzy",
+          "--filter-mode",
+          "global",
+          "--cmd-only",
+          "",
+        ],
         {
           stdout: "pipe",
           stderr: "pipe",
