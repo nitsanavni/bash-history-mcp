@@ -38,6 +38,11 @@ Tools:
 
 ### Write Hook Installation
 
+**Note:** If you've previously installed this package and are updating to a new version, clear Bun's cache first:
+```bash
+bun pm cache rm
+```
+
 **Step 1: Locate your settings file**
 
 Claude Code settings are in `~/.claude/settings.json`. Create it if it doesn't exist:
@@ -60,7 +65,7 @@ Edit `~/.claude/settings.json` and add:
         "hooks": [
           {
             "type": "command",
-            "command": "bunx --bun github:nitsanavni/bash-history-mcp/hook"
+            "command": "bunx --bun github:nitsanavni/bash-history-mcp hook"
           }
         ]
       }
@@ -80,7 +85,7 @@ Edit `~/.claude/settings.json` and add:
         "hooks": [
           {
             "type": "command",
-            "command": "bunx --bun github:nitsanavni/bash-history-mcp/hook"
+            "command": "bunx --bun github:nitsanavni/bash-history-mcp hook"
           }
         ]
       },
@@ -131,10 +136,15 @@ atuin history last
 
 ### MCP Server Installation
 
+**Note:** If you've previously installed this package and are updating to a new version, clear Bun's cache first:
+```bash
+bun pm cache rm
+```
+
 **Configure Claude Code to use the MCP server:**
 
 ```bash
-claude mcp add -s user bash-history bunx -- --bun github:nitsanavni/bash-history-mcp/mcp
+claude mcp add -s user bash-history bunx -- github:nitsanavni/bash-history-mcp mcp
 ```
 
 Or manually add to `~/.claude/settings.json`:
@@ -144,7 +154,7 @@ Or manually add to `~/.claude/settings.json`:
   "mcpServers": {
     "bash-history": {
       "command": "bunx",
-      "args": ["--bun", "github:nitsanavni/bash-history-mcp/mcp"]
+      "args": ["github:nitsanavni/bash-history-mcp", "mcp"]
     }
   }
 }
