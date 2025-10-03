@@ -1,8 +1,11 @@
 {
   "name": "bash-history-mcp",
+  "version": "0.1.0",
   "module": "index.ts",
   "type": "module",
-  "private": true,
+  "bin": {
+    "atuin-hook": "./index.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

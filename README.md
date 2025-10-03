@@ -33,16 +33,24 @@ Tools:
 
 ## Setup
 
+### Prerequisites
+- [atuin](https://github.com/atuinsh/atuin) installed and configured
+- [Bun](https://bun.sh) installed
+
 ### Write Hook Installation
 
-1. **Install from GitHub:**
+**Step 1: Locate your settings file**
+
+Claude Code settings are in `~/.claude/settings.json`. Create it if it doesn't exist:
 
 ```bash
-# Using Claude Code CLI
-claude mcp add -s user atuin-hook bunx -- --bun github:nitsanavni/bash-history-mcp
+mkdir -p ~/.claude
+touch ~/.claude/settings.json
 ```
 
-Or manually add to `~/.claude/settings.json`:
+**Step 2: Add the hook configuration**
+
+Edit `~/.claude/settings.json` and add:
 
 ```json
 {
@@ -62,22 +70,65 @@ Or manually add to `~/.claude/settings.json`:
 }
 ```
 
-2. **Requirements:**
-   - [atuin](https://github.com/atuinsh/atuin) installed and configured
-   - [Bun](https://bun.sh) installed
+**If you already have hooks configured**, merge with your existing configuration:
 
-3. **How it works:**
-   - After each bash command Claude executes, the hook:
-     - Captures command and exit code
-     - Calls `atuin history start` to create an entry
-     - Calls `atuin history end` with exit code and duration
-     - Fails silently if atuin is not available
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bunx --bun github:nitsanavni/bash-history-mcp"
+          }
+        ]
+      },
+      // ... your other PostToolUse hooks
+    ]
+    // ... your other hook types (PreToolUse, etc.)
+  }
+}
+```
 
-4. **Verify it's working:**
-   ```bash
-   # After Claude runs some commands, check:
-   atuin history last
-   ```
+**Step 3: Restart Claude Code**
+
+The hook will be active in your next Claude Code session.
+
+**Step 4: Verify it's working**
+
+After Claude runs some bash commands:
+
+```bash
+atuin history last
+```
+
+You should see the commands Claude executed.
+
+### How It Works
+
+After each bash command Claude executes:
+1. Hook receives JSON with command and exit code via stdin
+2. Calls `atuin history start "$COMMAND"` to get an entry ID
+3. Calls `atuin history end --exit $EXIT --duration 0 $ID`
+4. Fails silently if atuin is unavailable
+
+### Troubleshooting
+
+**Hook not running?**
+```bash
+# Check if hook is registered
+claude --debug
+# Run a command in Claude and look for hook execution logs
+```
+
+**Commands not appearing in atuin?**
+```bash
+# Test atuin manually
+atuin history start "test command"
+atuin history last
+```
 
 ## Implementation Plan
 1. ✅ Write hook with atuin integration
