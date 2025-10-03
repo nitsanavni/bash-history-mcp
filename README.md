@@ -134,7 +134,7 @@ atuin history last
 **Configure Claude Code to use the MCP server:**
 
 ```bash
-claude mcp add -s user atuin-history bunx -- --bun github:nitsanavni/bash-history-mcp/mcp
+claude mcp add -s user bash-history bunx -- --bun github:nitsanavni/bash-history-mcp/mcp
 ```
 
 Or manually add to `~/.claude/settings.json`:
@@ -142,7 +142,7 @@ Or manually add to `~/.claude/settings.json`:
 ```json
 {
   "mcpServers": {
-    "atuin-history": {
+    "bash-history": {
       "command": "bunx",
       "args": ["--bun", "github:nitsanavni/bash-history-mcp/mcp"]
     }
