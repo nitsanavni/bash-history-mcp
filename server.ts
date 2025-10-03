@@ -42,6 +42,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               description: "Maximum number of results to return (default: 5)",
               default: 5,
             },
+            include_failed: {
+              type: "boolean",
+              description: "Include commands that failed (non-zero exit code). Default: false",
+              default: false,
+            },
           },
           required: ["query"],
         },
@@ -57,6 +62,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               description: "Number of recent commands to retrieve (default: 5)",
               default: 5,
             },
+            include_failed: {
+              type: "boolean",
+              description: "Include commands that failed (non-zero exit code). Default: false",
+              default: false,
+            },
           },
         },
       },
@@ -71,6 +81,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   if (name === "search_history") {
     const query = args.query as string;
     const limit = (args.limit as number) || 5;
+    const includeFailed = (args.include_failed as boolean) || false;
 
     try {
       const proc = Bun.spawn(
@@ -78,12 +89,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           "atuin",
           "search",
           "--limit",
-          String(limit),
+          String(limit * 2), // Request more to account for filtering
           "--search-mode",
           "fuzzy",
           "--filter-mode",
           "global",
-          "--cmd-only",
+          "--format",
+          "{exit}\t{command}",
           query,
         ],
         {
@@ -107,7 +119,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      const commands = stdout.trim().split("\n").filter((line) => line.length > 0);
+      const lines = stdout.trim().split("\n").filter((line) => line.length > 0);
+      let commands = lines
+        .map((line) => {
+          const [exitCodeStr, ...commandParts] = line.split("\t");
+          return {
+            exitCode: parseInt(exitCodeStr, 10),
+            command: commandParts.join("\t"),
+          };
+        })
+        .filter((item) => includeFailed || item.exitCode === 0)
+        .map((item) => item.command)
+        .slice(0, limit);
 
       return {
         content: [
@@ -131,6 +154,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   if (name === "get_recent_history") {
     const limit = (args.limit as number) || 5;
+    const includeFailed = (args.include_failed as boolean) || false;
 
     try {
       const proc = Bun.spawn(
@@ -138,12 +162,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           "atuin",
           "search",
           "--limit",
-          String(limit),
+          String(limit * 2), // Request more to account for filtering
           "--search-mode",
           "fuzzy",
           "--filter-mode",
           "global",
-          "--cmd-only",
+          "--format",
+          "{exit}\t{command}",
           "",
         ],
         {
@@ -167,7 +192,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      const commands = stdout.trim().split("\n").filter((line) => line.length > 0);
+      const lines = stdout.trim().split("\n").filter((line) => line.length > 0);
+      let commands = lines
+        .map((line) => {
+          const [exitCodeStr, ...commandParts] = line.split("\t");
+          return {
+            exitCode: parseInt(exitCodeStr, 10),
+            command: commandParts.join("\t"),
+          };
+        })
+        .filter((item) => includeFailed || item.exitCode === 0)
+        .map((item) => item.command)
+        .slice(0, limit);
 
       return {
         content: [

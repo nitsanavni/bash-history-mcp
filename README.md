@@ -9,7 +9,7 @@ Bidirectional bash history integration between Claude Code and [atuin](https://g
 ## Architecture
 
 ### Write: Hook
-**Claude Code hook** → writes to atuin after each bash command
+**Claude Code hook** → writes commands to atuin after Claude executes each bash command
 
 ```bash
 # Post-bash-execution hook calls:
@@ -18,17 +18,17 @@ atuin history end --exit "$EXIT_CODE" --duration 0 "$id"
 ```
 
 ### Read: MCP Server
-**MCP server** → Claude queries your atuin history
+**MCP server** → Claude can query your atuin history
 
 Tools:
-- `search_history(query, limit?)` - find commands matching a pattern
-- `get_recent_history(limit?)` - recent commands
+- `search_history(query, limit?)` - Find commands matching a pattern
+- `get_recent_history(limit?)` - Get recent commands with timestamps and exit codes
 
 ## Benefits
-- Rerun commands Claude executed
-- Claude learns from your workflow
-- Rich metadata (timestamps, cwd, exit codes, duration)
-- Syncs across machines (if atuin sync enabled)
+- **Persistent history**: Rerun commands Claude executed from your terminal
+- **Context awareness**: Claude can learn from your command patterns and workflow
+- **Rich metadata**: Timestamps, working directory, exit codes, and duration
+- **Cross-machine sync**: History syncs across machines (if atuin sync is enabled)
 
 ## Setup
 
@@ -65,7 +65,7 @@ Edit `~/.claude/settings.json` and add:
         "hooks": [
           {
             "type": "command",
-            "command": "bunx --bun github:nitsanavni/bash-history-mcp hook"
+            "command": "bunx github:nitsanavni/bash-history-mcp hook"
           }
         ]
       }
@@ -85,7 +85,7 @@ Edit `~/.claude/settings.json` and add:
         "hooks": [
           {
             "type": "command",
-            "command": "bunx --bun github:nitsanavni/bash-history-mcp hook"
+            "command": "bunx github:nitsanavni/bash-history-mcp hook"
           }
         ]
       },
