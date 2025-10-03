@@ -21,9 +21,8 @@ atuin history end --exit "$EXIT_CODE" --duration 0 "$id"
 **MCP server** → Claude queries your atuin history
 
 Tools:
-- `search_history(query)` - find commands matching a pattern
-- `get_recent_history(limit)` - recent commands
-- `get_stats()` - command usage patterns
+- `search_history(query, limit?)` - find commands matching a pattern
+- `get_recent_history(limit?)` - recent commands
 
 ## Benefits
 - Rerun commands Claude executed
@@ -61,7 +60,7 @@ Edit `~/.claude/settings.json` and add:
         "hooks": [
           {
             "type": "command",
-            "command": "bunx --bun github:nitsanavni/bash-history-mcp"
+            "command": "bunx --bun github:nitsanavni/bash-history-mcp/hook"
           }
         ]
       }
@@ -81,7 +80,7 @@ Edit `~/.claude/settings.json` and add:
         "hooks": [
           {
             "type": "command",
-            "command": "bunx --bun github:nitsanavni/bash-history-mcp"
+            "command": "bunx --bun github:nitsanavni/bash-history-mcp/hook"
           }
         ]
       },
@@ -130,7 +129,40 @@ atuin history start "test command"
 atuin history last
 ```
 
-## Implementation Plan
+### MCP Server Installation
+
+**Configure Claude Code to use the MCP server:**
+
+```bash
+claude mcp add -s user atuin-history bunx -- --bun github:nitsanavni/bash-history-mcp/mcp
+```
+
+Or manually add to `~/.claude/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "atuin-history": {
+      "command": "bunx",
+      "args": ["--bun", "github:nitsanavni/bash-history-mcp/mcp"]
+    }
+  }
+}
+```
+
+**Available Tools:**
+
+- `search_history(query, limit?)` - Search for commands matching a pattern
+  ```
+  Example: search_history("git commit", 5)
+  ```
+
+- `get_recent_history(limit?)` - Get recent commands
+  ```
+  Example: get_recent_history(10)
+  ```
+
+## Implementation Status
 1. ✅ Write hook with atuin integration
 2. ✅ Test hook integration
-3. ⏳ MCP server with read-only atuin access
+3. ✅ MCP server with read-only atuin access
