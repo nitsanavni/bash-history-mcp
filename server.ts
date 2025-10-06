@@ -29,7 +29,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     tools: [
       {
         name: "search_history",
-        description: "Search command history using atuin. Returns matching commands with timestamps and context.",
+        description: "Search command history using atuin. Returns matching commands with timestamps and context. You can also use atuin directly via bash - try 'atuin --help' to learn more.",
         inputSchema: {
           type: "object",
           properties: {
@@ -53,7 +53,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "get_recent_history",
-        description: "Get recent command history from atuin with timestamps and exit codes.",
+        description: "Get recent command history from atuin with timestamps and exit codes. You can also use atuin directly via bash - try 'atuin --help' to learn more.",
         inputSchema: {
           type: "object",
           properties: {
@@ -132,11 +132,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         .map((item) => item.command)
         .slice(0, limit);
 
+      const atuinCommand = `atuin search --limit ${limit * 2} --search-mode fuzzy --filter-mode global --format "{exit}\\t{command}" "${query}"`;
+
       return {
         content: [
           {
             type: "text",
-            text: `Found ${commands.length} matching commands:\n\n${commands.join("\n")}`,
+            text: `Found ${commands.length} matching commands:\n\n${commands.join("\n")}\n\n---\nAtuin command used:\n${atuinCommand}`,
           },
         ],
       };
@@ -205,11 +207,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         .map((item) => item.command)
         .slice(0, limit);
 
+      const atuinCommand = `atuin search --limit ${limit * 2} --search-mode fuzzy --filter-mode global --format "{exit}\\t{command}" ""`;
+
       return {
         content: [
           {
             type: "text",
-            text: `Recent ${commands.length} commands:\n\n${commands.join("\n")}`,
+            text: `Recent ${commands.length} commands:\n\n${commands.join("\n")}\n\n---\nAtuin command used:\n${atuinCommand}`,
           },
         ],
       };
